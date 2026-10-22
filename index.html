@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1E3288">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Checklist Circuito SP - Ação Transportes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Layout: app de vistoria para tablet — lista de vistorias → ficha em 4 etapas com barra fixa; alvos de toque ≥ 48px */
+:root{
+  --bg:#EEF1F4; --surface:#FFFFFF; --ink:#14233A; --muted:#5B6676; --line:#D5DBE3;
+  --accent:#EDB43C; --accent-ink:#1B1600; --navy:#1E3288; --navy-ink:#FFFFFF;
+  --ok:#1E8A4C; --ok-soft:#DDF3E5; --bad:#C3362B; --bad-soft:#FBE3E0; --chip:#E4E8EE;
+  --c1:#E2703F; --c2:#EDB43C; --c3:#8DC03F; --c4:#3E8FDA; --c5:#1E3288;
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1622; --surface:#17212F; --ink:#E7ECF2; --muted:#9AA6B6; --line:#2A3748;
+  --accent:#EDB43C; --accent-ink:#1B1600; --navy:#17266B; --navy-ink:#E7ECF2;
+  --ok:#4CC27F; --ok-soft:#163525; --bad:#F06A5E; --bad-soft:#3A1C1A; --chip:#223044; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0E1622; --surface:#17212F; --ink:#E7ECF2; --muted:#9AA6B6; --line:#2A3748;
+  --accent:#EDB43C; --accent-ink:#1B1600; --navy:#17266B; --navy-ink:#E7ECF2;
+  --ok:#4CC27F; --ok-soft:#163525; --bad:#F06A5E; --bad-soft:#3A1C1A; --chip:#223044; color-scheme:dark }
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--navy)}
+.wrap{max-width:980px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 96px}
+header.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--navy);color:var(--navy-ink)}
+header.bar .in{max-width:980px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:.02em;text-transform:uppercase;display:flex;align-items:center;gap:10px}
+.brand .stripe{width:8px;height:26px;border-radius:2px;background:linear-gradient(var(--c1) 0 25%,var(--c2) 25% 50%,var(--c3) 50% 75%,var(--c4) 75%)}
+.bands{height:5px;background:linear-gradient(90deg,var(--c1) 0 25%,var(--c2) 25% 50%,var(--c3) 50% 75%,var(--c4) 75%)}
+.hero{border-radius:14px;overflow:hidden;background:var(--c5);color:#fff}
+.hero svg{display:block;width:100%;height:96px}
+.hero-in{padding:2px 20px 20px;display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end}
+.hero-in>div{flex:1 1 300px;min-width:0}
+.hero .eyebrow{font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#fff;opacity:.85}
+.hero h1{color:#fff;font-size:42px;margin-top:2px}
+.hero p{margin:4px 0 0;color:#fff;opacity:.88;max-width:60ch}
+.bar .sub{color:var(--navy-ink);opacity:.75;font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.save{font-size:13px;opacity:.8;white-space:nowrap}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn{min-height:48px;padding:0 18px;border-radius:8px;border:1px solid var(--line);background:var(--surface);font-weight:600;display:inline-flex;align-items:center;gap:8px}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.ghost{background:transparent;border-color:transparent;color:inherit}
+.btn.dark{background:var(--navy);color:var(--navy-ink);border-color:var(--navy)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+h1,h2,h3{font-family:var(--display);font-weight:700;text-wrap:balance;margin:0}
+h1{font-size:32px;text-transform:uppercase;letter-spacing:.01em}
+h2{font-size:24px;text-transform:uppercase;letter-spacing:.02em}
+h3{font-size:18px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.lead{color:var(--muted);margin:4px 0 0;max-width:65ch}
+.stack{display:flex;flex-direction:column;gap:16px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.spacer{flex:1}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px}
+.notice{border-radius:8px;padding:12px 14px;background:var(--chip);font-size:15px}
+.notice.bad{background:var(--bad-soft);color:var(--ink);border-left:4px solid var(--bad)}
+/* list */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.card{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.card .t{font-weight:600;font-size:17px}
+.card .m{color:var(--muted);font-size:14px;font-variant-numeric:tabular-nums}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:4px 10px;border-radius:999px;background:var(--chip);width:fit-content}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
+.empty{text-align:center;padding:40px 16px;color:var(--muted)}
+.cardopen{text-align:left;background:none;border:0;padding:0;display:flex;flex-direction:column;gap:6px;min-width:0;color:inherit}
+.acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-top:1px solid var(--line);padding-top:10px;margin-top:4px}
+.acts .btn,.row .btn.sm{min-height:44px;padding:0 12px;font-size:14px}
+.danger{color:var(--bad)!important}
+.btn.bad{background:var(--bad);color:#fff;border-color:var(--bad)}
+.modal{position:fixed;inset:0;background:rgba(10,17,27,.55);z-index:30;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal .box{background:var(--surface);color:var(--ink);border-radius:12px;padding:20px;max-width:480px;width:100%;display:flex;flex-direction:column;gap:12px}
+.modal .box p{margin:0;line-height:1.5}
+.linkbox{margin-top:10px;font-size:13px;word-break:break-all;background:var(--bg);padding:10px;border-radius:8px;user-select:all}
+.plate{font-family:var(--display);font-weight:700;letter-spacing:.08em;border:2px solid var(--ink);border-radius:4px;padding:0 6px;font-size:15px}
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.step{min-height:56px;border:1px solid var(--line);background:var(--surface);border-radius:8px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:6px 10px;text-align:left;min-width:0}
+.step b{font-family:var(--display);font-size:15px;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.step small{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+.step[aria-current="true"]{border-color:var(--navy);box-shadow:inset 0 -4px 0 var(--accent)}
+@media (max-width:640px){.steps{grid-template-columns:repeat(5,minmax(0,1fr))}.step small{display:none}.step b{font-size:13px}}
+/* fields */
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:640px){.grid{grid-template-columns:1fr}}
+label.f,div.f{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;color:var(--muted);min-width:0}
+input[type=text],input[type=tel],input[type=date],input[type=time],input[type=number],select,textarea{font:inherit;font-weight:500;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;min-height:50px;padding:10px 12px;width:100%}
+textarea{min-height:80px;resize:vertical}
+.full{grid-column:1/-1}
+/* inspection rows */
+.items{display:flex;flex-direction:column}
+.item{display:grid;grid-template-columns:minmax(0,1.4fr) auto minmax(0,1fr);gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.item:first-child{border-top:0}
+.item .name{font-weight:600}
+.item .name small{display:block;color:var(--muted);font-weight:400;font-size:13px}
+.item.flag .name{color:var(--bad)}
+@media (max-width:720px){.item{grid-template-columns:1fr}}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{min-height:48px;min-width:96px;border:0;background:var(--surface);font-weight:600;padding:0 14px}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"][data-v="ok"]{background:var(--ok);color:#fff}
+.seg button[aria-pressed="true"][data-v="avaria"]{background:var(--bad);color:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:48px;padding:0 16px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--ink);font-weight:600;display:inline-flex;align-items:center}
+.chip[aria-pressed="true"]{background:var(--navy);color:var(--navy-ink);border-color:var(--navy)}
+.ord{display:inline-flex;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);align-items:center;justify-content:center;font-size:13px;margin-right:8px}
+.ent{display:flex;flex-direction:column;gap:8px;padding-block:10px;border-top:1px solid var(--line)}
+.ent:first-of-type{border-top:0}
+.obs{display:flex;flex-direction:column;gap:8px;min-width:0}
+.was{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+/* checks */
+.checks{display:flex;flex-direction:column;gap:2px}
+.check{display:flex;gap:14px;align-items:center;min-height:56px;padding:6px 4px;border-top:1px solid var(--line);cursor:pointer}
+.check:first-child{border-top:0}
+.check input{width:30px;height:30px;accent-color:var(--ok);flex:none}
+.check span{min-width:0}
+/* photos */
+.photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+.ph{position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;background:var(--chip);max-width:100%}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.ph .x{position:absolute;top:4px;right:4px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-size:18px}
+.ph .n{position:absolute;left:4px;bottom:4px;background:rgba(0,0,0,.6);color:#fff;font-size:12px;padding:2px 6px;border-radius:4px}
+.addph{aspect-ratio:1;border:2px dashed var(--line);border-radius:8px;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-weight:600;color:var(--muted);max-width:100%}
+.addph svg{width:30px;height:30px}
+.occ{border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:12px;background:var(--bg)}
+.occ .hd{display:flex;align-items:center;gap:10px}
+.occ .num{font-family:var(--display);font-size:22px;font-weight:700}
+/* signatures */
+.term{font-size:15px;max-width:70ch;background:var(--bg);border-left:4px solid var(--accent);padding:12px 14px;border-radius:0 8px 8px 0}
+.sigs{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.sig{display:flex;flex-direction:column;gap:8px;min-width:0}
+.pad{width:100%;height:150px;background:#fff;border:1px solid var(--line);border-radius:8px;touch-action:none;display:block}
+.sigimg{width:100%;height:150px;object-fit:contain;background:#fff;border:1px solid var(--line);border-radius:8px}
+.sig .when{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.nav{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);z-index:5;padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav .in{max-width:980px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px;display:flex;gap:10px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--navy);color:var(--navy-ink);padding:10px 16px;border-radius:8px;z-index:20;font-weight:600;max-width:calc(100% - 32px)}
+.locked .chip,.locked .seg button,.locked input,.locked select,.locked textarea,.locked .addph,.locked .ph .x{pointer-events:none}
+.locked .addph,.locked .ph .x,.locked [data-edit]{display:none!important}
+@media (prefers-reduced-motion:no-preference){.btn,.seg button{transition:background .15s}}
+
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+img{max-width:100%}
+</style>
+</head>
+<body>
+
+<header class="bar"><div class="in">
+  <div class="brand"><span class="stripe" aria-hidden="true"></span>Vistoria / Evidências</div>
+  <div class="sub" id="sub">Circuito SP · Ação Transportes</div>
+  <div class="save" id="save"></div>
+</div><div class="bands" aria-hidden="true"></div></header>
+
+<main class="wrap" id="app"></main>
+<nav class="nav" id="nav" hidden><div class="in" id="navin"></div></nav>
+<div class="toast" id="toast" hidden></div>
+<div class="modal" id="modal" hidden><div class="box" role="dialog" aria-modal="true" aria-labelledby="mt"><h2 id="mt"></h2><p id="mx"></p><div class="row" id="mb" style="justify-content:flex-end"></div></div></div>
+<input type="file" id="picker" accept="image/*" multiple hidden>
+
+<script>
+const ITEMS=[
+ ["poltronas","Poltronas","Estofado sem rasgos, cortes ou manchas"],
+ ["encostos","Encostos, apoios de braço e reclinadores",""],
+ ["janelas","Janelas e vidros","Sem riscos, trincas ou pichação"],
+ ["emergencia","Saídas de emergência","Lacres intactos"],
+ ["teto","Teto, laterais e painéis","Sem riscos ou adesivos"],
+ ["banheiro","Banheiro",""]
+];
+const OBS=["","Risco","Rasgo","Corte","Mancha","Sujeira","Chiclete","Pichação","Adesivo","Peça quebrada","Peça solta","Lacre rompido","Pré-existente (já registrado)","Outro"];
+const CHECK_ANTES=[
+ ["fotos","Fotos do interior feitas (corredor, frente, fundo, 1 por fileira) com data e hora"],
+ ["acompanhou","Responsável da escola acompanhou a vistoria e confirmou as avarias pré-existentes"],
+ ["lista","Lista nominal dos alunos entregue e conferida com o nº de embarcados"]
+];
+const CHECK_ORIENT=[
+ ["sentado","Permanecer sentado e com cinto durante todo o trajeto"],
+ ["riscar","Proibido riscar, rabiscar, colar adesivo ou subir nas poltronas"],
+ ["emerg","Não abrir saídas de emergência nem mexer em martelinhos e extintor"],
+ ["lixo","Lixo no saco entregue pela equipe, nada no chão ou nas poltronas"],
+ ["danos","Avisado que danos serão apurados e comunicados à diretoria da escola"]
+];
+const CHECK_DEPOIS=[
+ ["contados","Alunos desembarcados e contados (mesmo nº do embarque)"],
+ ["permanece","Responsável da escola permanece até o fim da vistoria"],
+ ["chegada","Vistoria de chegada acima preenchida, item por item, com o responsável"],
+ ["piso","Poltronas e piso verificados à procura de chiclete, líquido, riscos e cortes"],
+ ["lixo2","Lixo recolhido; objetos esquecidos registrados e entregues à escola"],
+ ["lacres","Lacres das saídas de emergência conferidos"],
+ ["fotogrupo","Foto do grupo tirada na frente do ônibus"],
+ ["avaria","Avaria nova encontrada? Registrar na etapa 4 e fotografar de perto"],
+ ["semavaria","Sem avarias: marcar \"Sem ocorrências\" na etapa 4 e colher assinaturas"]
+];
+const LOCAIS=["","Frente / motorista","Corredor","Banheiro","Fundo",...Array.from({length:15},(_,i)=>"Fileira "+(i+1)+" – lado motorista"),...Array.from({length:15},(_,i)=>"Fileira "+(i+1)+" – lado porta"),"Externo"];
+const TERMO="Eu, responsável acima identificado, declaro que acompanhei as vistorias de saída e chegada do ônibus e que as informações registradas neste checklist são verdadeiras. Estou ciente de que a ocorrência será comunicada à Prefeitura de São Paulo e à direção da escola para apuração e ressarcimento, conforme as regras do Projeto Circuito São Paulo.";
+const SIGNERS=[["escola","Responsável da escola"],["agente","Coordenador / supervisor da ação"],["motorista","Motorista"]];
+const STEPS=[["ident","Identificação"],["antes","Antes"],["depois","Depois"],["ocorr","Ocorrências"],["assin","Assinaturas"]];
+
+let db=null, assets=null, downloads=null, hashDone=false, list=[], cur=null, step="ident", saveTimer=null, photoTarget=null, ready=false;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const today=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const fmtDate=s=>s?s.split("-").reverse().join("/"):"sem data";
+const nowStr=()=>new Date().toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"});
+function toast(m){const t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,2600)}
+function blank(){return{ident:{data:today(),escola:"",resp:"",cargo:"",doc:"",tel:"",alunos:"",adultos:"",prefixo:"",placa:"",motorista:"",agente:"",guia:"",embarque:"",retorno:"",roteiro:""},
+ saida:{},obsSaida:{},chegada:{},obsChegada:{},checks:{},ocorrencia:"",ocorrencias:[],passeio:"",passeioOc:[],roteiroSel:[],roteiroOutro:"",entregaFotos:{},evidencias:[],obsSaidaTxt:{},obsChegadaTxt:{},
+ sig:{},recusa:{ativa:false,motivo:"",testemunha:"",sig:null},status:"andamento",criado:Date.now(),atualizado:Date.now()}}
+
+function status(v){
+  const oc=v.ocorrencia==="com"||v.passeio==="com";
+  if(v.status==="concluida") return oc?["bad","Concluída com ocorrência"]:["ok","Concluída"];
+  return oc?["bad","Em andamento · ocorrência"]:["","Em andamento"];
+}
+function novas(v){return ITEMS.filter(([k])=>v.chegada[k]==="avaria"&&v.saida[k]!=="avaria").map(i=>i[1])}
+
+/* ---------- list ---------- */
+function renderList(){
+  cur=null; $("#nav").hidden=true; $("#sub").textContent="Circuito SP · Ação Transportes"; $("#save").textContent="";
+  const items=[...list].sort((a,b)=>(b.data.ident?.data||"").localeCompare(a.data.ident?.data||"")||(b.data.atualizado||0)-(a.data.atualizado||0));
+  $("#app").innerHTML=`<div class="stack">
+   <div class="hero"><svg viewBox="0 0 1000 170" preserveAspectRatio="none" aria-hidden="true"><polygon fill="#E2703F" points="0,0 1000,0 1000,30 500,70 0,30"/><polygon fill="#EDB43C" points="0,30 500,70 1000,30 1000,65 500,105 0,65"/><polygon fill="#8DC03F" points="0,65 500,105 1000,65 1000,100 500,140 0,100"/><polygon fill="#3E8FDA" points="0,100 500,140 1000,100 1000,125 500,165 0,125"/></svg>
+   <div class="hero-in"><div><div class="eyebrow">Circuito SP · Ação Transportes</div><h1>Checklist / Evidências</h1><p>Uma ficha por ônibus e por passeio. Preencha com o responsável da escola antes do embarque e depois do desembarque. Os checklists ficam salvos neste tablet; envie o PDF pelo botão Compartilhar.</p></div>
+   ${db&&assets?`<button class="btn primary" id="new">+ Novo checklist</button>`:""}</div></div>
+   ${db&&!assets&&ready?`<div class="notice bad"><b>Seu acesso é só para visualizar.</b> Para criar e preencher checklists, peça ao responsável pela página para compartilhar com o seu e-mail com permissão de <b>Editor</b>. Depois recarregue a página.</div>`:""}
+   ${!db&&ready?`<div class="notice bad"><b>Entre na sua conta Claude para usar as vistorias.</b> Toque em <b>Entrar</b> no topo da página. Se já entrou e esta mensagem continua, peça ao responsável para compartilhar a página com o seu e-mail, com permissão para editar.</div>`:""}
+   ${!ready?`<div class="empty">Carregando vistorias…</div>`:!db?"":items.length?`<div class="cards">${items.map(({id,data:v})=>{const [c,l]=status(v);const i=v.ident||{};
+     return `<div class="card"><button class="cardopen" data-open="${esc(id)}"><span class="pill ${c}">${l}</span><span class="t">${esc(i.escola||"Escola não informada")}</span>
+     <span class="m">${fmtDate(i.data)}${i.embarque?" · "+esc(i.embarque):""}${i.placa?` · <span class="plate">${esc(i.placa)}</span>`:""}</span>
+     <span class="m">${esc(i.resp||"Responsável não informado")}${i.alunos?" · "+esc(i.alunos)+" alunos":""}</span></button><div class="acts">${actBtns(id)}</div></div>`}).join("")}</div>`
+   :`<div class="panel empty"><h2>Nenhum checklist ainda</h2><p>Toque em <b>Novo checklist</b> ao chegar na escola. A ficha salva sozinha a cada alteração.</p></div>`}
+  </div>`;
+  $("#new")?.addEventListener("click",()=>{const ref=db.collection("vistorias").doc();cur={id:ref.id,v:blank()};step="ident";persist(true);renderForm()});
+  document.querySelectorAll("[data-open]").forEach(b=>b.addEventListener("click",()=>openRec(list.find(x=>x.id===b.dataset.open))));
+  wireActs();
+}
+
+/* ---------- save ---------- */
+function persist(now){
+  if(!db||!cur) return; cur.v.atualizado=Date.now(); $("#save").textContent="Salvando…";
+  clearTimeout(saveTimer);
+  const go=async()=>{const snap={...cur.v},id=cur.id;try{await db.collection("vistorias").doc(id).set(JSON.parse(JSON.stringify(snap)));if(cur&&cur.id===id)$("#save").textContent="Salvo às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})}
+    catch(e){$("#save").textContent="Não salvou";toast(e?.code==="quota_exceeded"?"Armazenamento cheio. Avise o administrador.":"Não foi possível salvar. Verifique a internet; a ficha tenta de novo na próxima alteração.")}};
+  now?go():saveTimer=setTimeout(go,700);
+}
+
+/* ---------- form ---------- */
+function counts(){const v=cur.v;
+  const identF=Object.values(v.ident).filter(Boolean).length, identT=Object.keys(v.ident).length;
+  const antes=ITEMS.filter(([k])=>v.saida[k]).length+[...CHECK_ANTES,...CHECK_ORIENT].filter(([k])=>v.checks[k]).length, antesT=ITEMS.length+CHECK_ANTES.length+CHECK_ORIENT.length;
+  const dep=ITEMS.filter(([k])=>v.chegada[k]).length+[...CHECK_DEPOIS,...ENTREGAS].filter(([k])=>v.checks[k]).length, depT=ITEMS.length+CHECK_DEPOIS.length+ENTREGAS.length;
+  const sig=SIGNERS.filter(([k])=>v.sig[k]?.img).length;
+  return{ident:identF+"/"+identT,antes:antes+"/"+antesT,depois:dep+"/"+depT,ocorr:(v.ocorrencia==="com"?v.ocorrencias.length:v.ocorrencia==="sem"?0:"—")+" ônibus · "+(v.passeio==="com"?v.passeioOc.length:v.passeio==="sem"?0:"—")+" passeio",assin:sig+"/3"}}
+
+function renderForm(){
+  const v=cur.v, locked=v.status==="concluida", c=counts();
+  $("#sub").textContent=(v.ident.escola||"Nova vistoria")+(v.ident.placa?" · "+v.ident.placa:"");
+  const body={ident:fIdent,antes:fAntes,depois:fDepois,ocorr:fOcorr,assin:fAssin}[step]();
+  $("#app").innerHTML=`<div class="stack ${locked?"locked":""}">
+   <div class="row"><button class="btn ghost" id="back">‹ Vistorias</button><span class="spacer"></span>${actBtns(cur.id,true)}
+   ${locked?`<span class="pill ok">Concluída</span><button class="btn" id="reopen">Reabrir</button>`:""}</div>
+   <div class="steps" role="tablist">${STEPS.map(([k,l],i)=>`<button class="step" role="tab" data-step="${k}" aria-current="${k===step}"><b>${i+1}. ${l}</b><small>${c[k]}</small></button>`).join("")}</div>
+   ${!assets?`<div class="notice bad"><b>Seu acesso é só para visualizar.</b> As alterações, fotos e assinaturas não serão salvas. Peça ao responsável pela página para compartilhar com o seu e-mail com permissão de <b>Editor</b> e depois recarregue a página.</div>`:""}
+   ${body}</div>`;
+  const i=STEPS.findIndex(s=>s[0]===step);
+  $("#nav").hidden=false;
+  $("#navin").innerHTML=`<button class="btn" id="prev" ${i===0?"disabled":""}>‹ Voltar</button><span class="spacer"></span>
+   ${i<STEPS.length-1?`<button class="btn dark" id="next">Próxima: ${STEPS[i+1][1]} ›</button>`:locked?"":`<button class="btn primary" id="finish">Concluir vistoria</button>`}`;
+  wire();hydrate();
+}
+const go=k=>{step=k;renderForm();window.scrollTo({top:0})};
+
+function fIdent(){const i=cur.v.ident;const t=(k,l,type="text",ph="",cls="")=>`<label class="f ${cls}">${l}<input type="${type}" id="i_${k}" data-i="${k}" value="${esc(i[k])}" ${ph?`placeholder="${esc(ph)}"`:""} ${type==="number"?'inputmode="numeric" min="0"':""}></label>`;
+ return `<section class="panel stack"><div><h2>1. Identificação do passeio</h2><p class="lead">Preencha junto com o responsável da escola, antes do embarque.</p></div>
+ <div class="grid">${t("data","Data do passeio","date")}${t("embarque","Horário de embarque","time")}
+ ${t("retorno","Horário de retorno","time")}${sel("guia","Guia do passeio",["Carolina Pontes","Caroline Santos"])}
+ ${rotBlock()}
+ ${t("escola","Escola","text","Nome da escola","full")}
+ ${t("resp","Responsável da escola","text","Nome completo")}${t("cargo","Cargo do responsável","text","Ex.: Coordenador pedagógico")}
+ ${t("doc","RG / CPF do responsável")}${t("tel","Telefone do responsável","tel","(11) 9____-____")}
+ ${t("alunos","Nº de alunos embarcados","number")}${t("adultos","Nº de representantes da escola","number")}
+ ${sel("prefixo","Ônibus (prefixo)",["200","380"])}<label class="f">Placa<select id="i_placa" data-i="placa">${["","URN 9A65","URN 1A72"].map(p=>`<option value="${p}" ${p===i.placa?"selected":""}>${p||"Selecione"}</option>`).join("")}</select></label>
+ <label class="f">Motorista<select id="i_motorista" data-i="motorista">${["","Adilson Cabral","Severino Leite"].map(p=>`<option value="${p}" ${p===i.motorista?"selected":""}>${p||"Selecione"}</option>`).join("")}</select></label>${t("agente","Coordenador / supervisor da ação")}</div></section>`}
+function sel(k,l,opts){const i=cur.v.ident;return `<label class="f">${l}<select id="i_${k}" data-i="${k}">${["",...opts].map(p=>`<option value="${esc(p)}" ${p===i[k]?"selected":""}>${p||"Selecione"}</option>`).join("")}</select></label>`}
+const ROTEIRO=["Museu Catavento","Museu da Imigração","Mercado Municipal","Teatro Municipal","Parque Ibirapuera","Pátio do Colégio","Praça da Sé","Centro Histórico","Outro"];
+function rotBlock(){const v=cur.v,sel=v.roteiroSel||[];return `<div class="f full"><span>Roteiro <span style="font-weight:400">· toque nos locais na ordem da visita</span></span><div class="chips" role="group" aria-label="Roteiro">${ROTEIRO.map(n=>{const i=sel.indexOf(n);return `<button class="chip" data-rot="${esc(n)}" aria-pressed="${i>=0}">${i>=0?`<b class="ord">${i+1}</b>`:""}${esc(n)}</button>`}).join("")}</div>${sel.includes("Outro")?`<input type="text" id="rot_outro" value="${esc(v.roteiroOutro||"")}" placeholder="Qual local?">`:""}</div>`}
+function syncRot(){const v=cur.v;v.ident.roteiro=(v.roteiroSel||[]).map(x=>x==="Outro"?(v.roteiroOutro?"Outro: "+v.roteiroOutro:"Outro"):x).join(" · ")}
+
+function seg(side,k){const val=cur.v[side][k];return `<div class="seg" role="group" aria-label="Estado">${[["ok","OK"],["avaria","Avaria"]].map(([x,l])=>`<button data-seg="${side}" data-k="${k}" data-v="${x}" aria-pressed="${val===x}">${l}</button>`).join("")}</div>`}
+function obsSel(side,k){const val=cur.v[side][k]||"",txt=(cur.v[side+"Txt"]||{})[k]||"";return `<div class="obs"><select data-obs="${side}" data-k="${k}" id="${side}_${k}" aria-label="Observação">${OBS.map(o=>`<option value="${esc(o)}" ${o===val?"selected":""}>${o||"Observação (opcional)"}</option>`).join("")}</select>
+ ${val==="Outro"?`<input type="text" id="${side}Txt_${k}" data-obst="${side}" data-k="${k}" value="${esc(txt)}" placeholder="Descreva qual avaria">`:""}</div>`}
+function obsLabel(side,k){const val=cur.v[side][k]||"",txt=(cur.v[side+"Txt"]||{})[k]||"";return val==="Outro"&&txt?"Outro: "+txt:val}
+const PH=new Set(["lista","lixo2"]);
+function checkRow(k,l){return `<label class="check"${PH.has(k)?' style="border-top:0"':""}><input type="checkbox" id="c_${k}" data-c="${k}" ${cur.v.checks[k]?"checked":""}><span>${esc(l)}</span></label>`}
+function checks(arr){return `<div class="checks">${arr.map(([k,l])=>PH.has(k)?`<div class="ent">${checkRow(k,l)}${photos((cur.v.entregaFotos||{})[k]||[],"e:"+k)}</div>`:checkRow(k,l)).join("")}</div>`}
+
+function fAntes(){return `<section class="panel stack"><div><h2>2. Antes do embarque</h2><p class="lead">Registre o estado do ônibus com o responsável da escola. Tempo estimado: 10 minutos.</p></div>
+ <div><h3>Vistoria de saída</h3><div class="items">${ITEMS.map(([k,n,d])=>`<div class="item"><div class="name">${n}${d?`<small>${d}</small>`:""}</div>${seg("saida",k)}${obsSel("obsSaida",k)}</div>`).join("")}</div></div></section>
+ <section class="panel stack"><h3>Conferência</h3>${checks(CHECK_ANTES)}</section>
+ <section class="panel stack"><div><h3>Orientação aos alunos</h3><p class="lead">Feita pelo guia, dentro do ônibus.</p></div>${checks(CHECK_ORIENT)}</section>`}
+
+function fDepois(){const n=novas(cur.v);return `<section class="panel stack"><div><h2>3. Depois do desembarque</h2><p class="lead">Compare com a saída antes de liberar o responsável da escola.</p></div>
+ ${n.length?`<div class="notice bad"><b>Avaria nova:</b> ${n.map(esc).join(", ")}. Registre na etapa 4 com fotos. <button class="btn" data-go="ocorr" style="margin-left:8px">Ir para ocorrências</button></div>`:""}
+ <div><h3>Vistoria de chegada</h3><div class="items">${ITEMS.map(([k,nm,d])=>{const s=cur.v.saida[k];const flag=cur.v.chegada[k]==="avaria"&&s!=="avaria";
+  return `<div class="item ${flag?"flag":""}"><div class="name">${nm}<small><span class="was">Saída: ${s==="ok"?"OK":s==="avaria"?"Avaria"+(obsLabel("obsSaida",k)?" ("+esc(obsLabel("obsSaida",k))+")":""):"não vistoriado"}</span></small></div>${seg("chegada",k)}${obsSel("obsChegada",k)}</div>`}).join("")}</div></div></section>
+ <section class="panel stack"><h3>Conferência</h3>${checks(CHECK_DEPOIS)}</section>
+ ${fEntregas()}`}
+const ENTREGAS=[["lanche","Kit lanche entregue"],["agua","Água entregue"],["brinde","Sacolinha de brinde do evento entregue"]];
+function fEntregas(){const f=cur.v.entregaFotos||{};return `<section class="panel stack"><div><h3>Entregas aos alunos</h3><p class="lead">Marque cada entrega e registre uma foto como evidência.</p></div>
+ ${ENTREGAS.map(([k,l])=>`<div class="ent"><label class="check" style="border-top:0"><input type="checkbox" id="c_${k}" data-c="${k}" ${cur.v.checks[k]?"checked":""}><span>${l}</span></label>${photos(f[k]||[],"e:"+k)}</div>`).join("")}</section>`}
+
+const PASSEIO_TIPOS=["","Aluno passou mal","Aluno se machucou","Aluno se perdeu / separou do grupo","Indisciplina / briga entre alunos","Local em manutenção ou fechado","Chuva / clima","Atraso na saída ou no retorno","Trânsito / rota alterada","Problema mecânico no ônibus","Outro"];
+const PROVID=["","Responsável da escola acionado","Família avisada","Primeiros socorros no local","SAMU / atendimento médico","Roteiro alterado","Passeio encerrado antes do previsto","Nenhuma providência necessária","Outro"];
+function pSel(ix,o,f,l,opts,cls=""){return `<label class="f ${cls}">${l}<select data-p="${ix}" data-f="${f}" id="p${ix}_${f}">${opts.map(x=>`<option ${x===o[f]?"selected":""} value="${esc(x)}">${x||"Selecione"}</option>`).join("")}</select></label>`}
+function pTxt(ix,o,f,l,ph="",cls="full",type="text"){return `<label class="f ${cls}">${l}<input type="${type}" data-p="${ix}" data-f="${f}" id="p${ix}_${f}" value="${esc(o[f])}" ${ph?`placeholder="${esc(ph)}"`:""}></label>`}
+function fPasseio(){const v=cur.v;return `<section class="panel stack"><div><h3>B. Durante o passeio</h3><p class="lead">Ocorrências com alunos ou no local visitado: aluno passou mal, local fechado, chuva, atraso.</p></div>
+ <div class="checks"><label class="check"><input type="radio" name="pa" id="pa_sem" data-pa="sem" ${v.passeio==="sem"?"checked":""}><span>Sem ocorrências no passeio</span></label>
+ <label class="check"><input type="radio" name="pa" id="pa_com" data-pa="com" ${v.passeio==="com"?"checked":""}><span>Com ocorrências no passeio (registrar abaixo)</span></label></div></section>
+ ${v.passeio==="com"?`<section class="stack">${v.passeioOc.map((o,ix)=>`<div class="occ"><div class="hd"><span class="num">P${ix+1}</span><span class="spacer"></span><button class="btn ghost" data-delpa="${ix}" data-edit>Excluir</button></div>
+  <div class="grid">${pSel(ix,o,"tipo","Tipo de ocorrência",PASSEIO_TIPOS)}${pTxt(ix,o,"horario","Horário","","","time")}
+  ${o.tipo==="Outro"?pTxt(ix,o,"tipoOutro","Qual ocorrência?","Descreva o que aconteceu"):""}
+  ${pSel(ix,o,"aluno","Aluno envolvido?",["","Sim","Não"])}${pSel(ix,o,"provid","Providência tomada",PROVID)}
+  ${o.aluno==="Sim"?pTxt(ix,o,"alunos","Nome(s) do(s) aluno(s)"):""}
+  ${o.provid==="Outro"?pTxt(ix,o,"providOutro","Qual providência?","Descreva a providência"):""}
+  ${pTxt(ix,o,"desc","Detalhe (opcional)","Ex.: aluna com tontura, atendida pela professora")}</div>
+  <div><h3>Fotos (opcional)</h3>${photos(o.fotos||[],"p"+ix)}</div></div>`).join("")}
+  <button class="btn primary" id="addpa" data-edit>+ Adicionar ocorrência do passeio</button></section>`:""}`}
+const camIcon=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 8h3l2-2.5h6L17 8h3v11H4z"/><circle cx="12" cy="13.5" r="3.5"/></svg>`;
+function photos(arr,target){return `<div class="photos">${arr.map((id,i)=>`<div class="ph"><img data-blob="${esc(id)}" ${bl(id)?`src="${bl(id)}"`:""} alt="Foto ${i+1}" loading="lazy"><span class="n">${i+1}</span><button class="x" data-rm="${target}" data-idx="${i}" aria-label="Remover foto ${i+1}">×</button></div>`).join("")}
+ ${assets?`<button class="addph" data-add="${target}">${camIcon}Adicionar foto</button>`:""}</div>${!assets?`<p class="lead">Seu acesso não permite enviar fotos. Peça acesso de edição ao responsável pela página.</p>`:""}`}
+
+function fOcorr(){const v=cur.v,n=novas(v);return `<section class="panel stack"><div><h2>4. Ocorrências</h2><p class="lead">Registre o que aconteceu no ônibus e durante o passeio.</p></div>
+ <div><h3>A. No ônibus</h3><p class="lead">Cada dano com local e fotos de perto.</p></div>
+ ${n.length&&v.ocorrencia!=="com"?`<div class="notice bad">A vistoria de chegada aponta avaria nova em: ${n.map(esc).join(", ")}.</div>`:""}
+ <div class="checks"><label class="check"><input type="radio" name="oc" id="oc_sem" data-oc="sem" ${v.ocorrencia==="sem"?"checked":""}><span>Sem ocorrências no ônibus</span></label>
+ <label class="check"><input type="radio" name="oc" id="oc_com" data-oc="com" ${v.ocorrencia==="com"?"checked":""}><span>Com ocorrências no ônibus (registrar abaixo)</span></label></div></section>
+ ${v.ocorrencia==="com"?`<section class="stack">${v.ocorrencias.map((o,ix)=>`<div class="occ"><div class="hd"><span class="num">Nº ${ix+1}</span><span class="spacer"></span><button class="btn ghost" data-delocc="${ix}" data-edit>Excluir</button></div>
+  <div class="grid"><label class="f">Item danificado<select data-o="${ix}" data-f="item" id="o${ix}_item">${["",...ITEMS.map(i=>i[1]),"Outro"].map(x=>`<option ${x===o.item?"selected":""} value="${esc(x)}">${x||"Selecione"}</option>`).join("")}</select></label>
+  ${o.item==="Outro"?`<label class="f">Qual item?<input type="text" data-o="${ix}" data-f="itemOutro" id="o${ix}_itemOutro" value="${esc(o.itemOutro)}" placeholder="Descreva o item"></label>`:""}
+  <label class="f">Local<select data-o="${ix}" data-f="local" id="o${ix}_local">${LOCAIS.map(x=>`<option ${x===o.local?"selected":""} value="${esc(x)}">${x||"Selecione"}</option>`).join("")}</select></label>
+  <label class="f">Tipo de dano<select data-o="${ix}" data-f="dano" id="o${ix}_dano">${OBS.filter(x=>x!=="Pré-existente (já registrado)").map(x=>`<option ${x===o.dano?"selected":""} value="${esc(x)}">${x||"Selecione"}</option>`).join("")}</select></label>
+  ${o.dano==="Outro"?`<label class="f">Qual avaria?<input type="text" data-o="${ix}" data-f="danoOutro" id="o${ix}_danoOutro" value="${esc(o.danoOutro)}" placeholder="Descreva a avaria"></label>`:""}
+  <label class="f">Aluno(s) identificado(s)?<select data-o="${ix}" data-f="ident" id="o${ix}_ident">${["","Sim","Não"].map(x=>`<option ${x===o.ident?"selected":""} value="${x}">${x||"Selecione"}</option>`).join("")}</select></label>
+  ${o.ident==="Sim"?`<label class="f full">Nome(s) do(s) aluno(s)<input type="text" data-o="${ix}" data-f="alunos" id="o${ix}_alunos" value="${esc(o.alunos)}"></label>`:""}
+  <label class="f full">Detalhe (opcional)<input type="text" data-o="${ix}" data-f="desc" id="o${ix}_desc" value="${esc(o.desc)}" placeholder="Ex.: corte de 10 cm no assento"></label></div>
+  <div><h3>Fotos da ocorrência</h3>${photos(o.fotos||[],"o"+ix)}</div></div>`).join("")}
+  <button class="btn primary" id="addocc" data-edit>+ Adicionar ocorrência</button></section>`:""}
+ ${fPasseio()}
+ <section class="panel stack"><div><h3>Evidências gerais</h3><p class="lead">Fotos do interior na saída e na chegada. Use câmera ou galeria.</p></div>${photos(v.evidencias,"ev")}</section>`}
+
+function sigBox(key,label,data){return `<div class="sig"><b>${label}</b>${data?.img?`<img class="sigimg" data-blob="${esc(data.img)}" ${bl(data.img)?`src="${bl(data.img)}"`:""} alt="Assinatura ${label}"><span class="when">${esc(data.nome)} · ${esc(data.quando)}</span><button class="btn" data-clearsig="${key}" data-edit>Refazer assinatura</button>`
+ :`<input type="text" id="sn_${key}" placeholder="Nome de quem assina" value="${esc(data?.nome||defName(key))}"><canvas class="pad" data-pad="${key}" aria-label="Área para assinar com o dedo"></canvas>
+ <div class="row"><button class="btn" data-padclear="${key}">Limpar</button><span class="spacer"></span><button class="btn dark" data-padok="${key}" ${assets?"":"disabled"}>Confirmar assinatura</button></div>`}</div>`}
+function defName(k){const i=cur.v.ident;return k==="escola"?i.resp:k==="agente"?i.agente:k==="motorista"?i.motorista:""}
+
+function fAssin(){const v=cur.v,r=v.recusa;return `<section class="panel stack"><div><h2>Termo de responsabilidade</h2><p class="lead">Assinaturas com o dedo na tela.</p></div>
+ <p class="term">${TERMO}</p><div class="sigs">${SIGNERS.map(([k,l])=>sigBox(k,l,v.sig[k])).join("")}</div></section>
+ <section class="panel stack"><label class="check"><input type="checkbox" id="rec" data-rec ${r.ativa?"checked":""}><span>Responsável da escola recusou assinar</span></label>
+ ${r.ativa?`<div class="grid"><label class="f">Motivo<select id="rec_motivo" data-recf="motivo">${["","Não concorda com a avaria apontada","Saiu antes do fim da vistoria","Não se considera responsável","Outro"].map(x=>`<option ${x===r.motivo?"selected":""} value="${esc(x)}">${x||"Selecione"}</option>`).join("")}</select></label>
+ ${r.motivo==="Outro"?`<label class="f">Qual motivo?<input type="text" id="rec_motivoOutro" data-recf="motivoOutro" value="${esc(r.motivoOutro)}" placeholder="Descreva o motivo"></label>`:""}
+ <label class="f">Testemunha<input type="text" id="rec_test" data-recf="testemunha" value="${esc(r.testemunha)}" placeholder="Nome completo"></label></div>
+ <div class="sigs">${sigBox("testemunha","Assinatura da testemunha",r.sig)}</div>`:""}</section>`}
+
+/* ---------- wiring ---------- */
+function wire(){
+  const v=cur.v;
+  wireActs();
+  $("#back").onclick=()=>{persist(true);renderList()};
+  $("#reopen")&&($("#reopen").onclick=()=>{v.status="andamento";persist(true);renderForm()});
+  document.querySelectorAll("[data-step]").forEach(b=>b.onclick=()=>go(b.dataset.step));
+  document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
+  $("#prev").onclick=()=>{const i=STEPS.findIndex(s=>s[0]===step);if(i>0)go(STEPS[i-1][0])};
+  $("#next")&&($("#next").onclick=()=>{const i=STEPS.findIndex(s=>s[0]===step);go(STEPS[i+1][0])});
+  $("#finish")&&($("#finish").onclick=finish);
+  document.querySelectorAll("[data-i]").forEach(el=>el.oninput=()=>{v.ident[el.dataset.i]=el.value;if(["escola","placa"].includes(el.dataset.i))$("#sub").textContent=(v.ident.escola||"Nova vistoria")+(v.ident.placa?" · "+v.ident.placa:"");persist()});
+  document.querySelectorAll("[data-rot]").forEach(b=>b.onclick=()=>{const n=b.dataset.rot,s=v.roteiroSel||(v.roteiroSel=[]),i=s.indexOf(n);i>=0?s.splice(i,1):s.push(n);syncRot();persist();renderForm();if(n==="Outro"&&i<0)$("#rot_outro")?.focus()});
+  $("#rot_outro")&&($("#rot_outro").oninput=e=>{v.roteiroOutro=e.target.value;syncRot();persist()});
+  document.querySelectorAll("[data-seg]").forEach(b=>b.onclick=()=>{const s=b.dataset.seg,k=b.dataset.k;v[s][k]=v[s][k]===b.dataset.v?"":b.dataset.v;persist();renderForm()});
+  document.querySelectorAll("[data-obs]").forEach(el=>el.onchange=()=>{const s=el.dataset.obs,k=el.dataset.k,was=v[s][k];v[s][k]=el.value;persist();
+    if(el.value==="Outro"||was==="Outro"){renderForm();document.getElementById(s+"Txt_"+k)?.focus()}});
+  document.querySelectorAll("[data-obst]").forEach(el=>el.oninput=()=>{const s=el.dataset.obst+"Txt";(v[s]||(v[s]={}))[el.dataset.k]=el.value;persist()});
+  document.querySelectorAll("[data-c]").forEach(el=>el.onchange=()=>{v.checks[el.dataset.c]=el.checked;persist();updateCounts()});
+  document.querySelectorAll("[data-oc]").forEach(el=>el.onchange=()=>{v.ocorrencia=el.dataset.oc;if(v.ocorrencia==="com"&&!v.ocorrencias.length)v.ocorrencias.push(newOcc());persist();renderForm()});
+  $("#addocc")&&($("#addocc").onclick=()=>{v.ocorrencias.push(newOcc());persist();renderForm()});
+  document.querySelectorAll("[data-pa]").forEach(el=>el.onchange=()=>{v.passeio=el.dataset.pa;if(v.passeio==="com"&&!v.passeioOc.length)v.passeioOc.push(newPa());persist();renderForm()});
+  $("#addpa")&&($("#addpa").onclick=()=>{v.passeioOc.push(newPa());persist();renderForm()});
+  document.querySelectorAll("[data-delpa]").forEach(b=>{let armed=false;b.onclick=()=>{if(!armed){armed=true;b.textContent="Toque de novo para excluir";setTimeout(()=>{armed=false;b.textContent="Excluir"},3000);return}v.passeioOc.splice(+b.dataset.delpa,1);persist();renderForm()}});
+  document.querySelectorAll("[data-p]").forEach(el=>{const h=()=>{v.passeioOc[+el.dataset.p][el.dataset.f]=el.value;persist();if(el.tagName==="SELECT"){renderForm();document.getElementById("p"+el.dataset.p+"_"+el.dataset.f+"Outro")?.focus()}};el.tagName==="SELECT"?el.onchange=h:el.oninput=h});
+  document.querySelectorAll("[data-delocc]").forEach(b=>{let armed=false;b.onclick=()=>{if(!armed){armed=true;b.textContent="Toque de novo para excluir";setTimeout(()=>{armed=false;b.textContent="Excluir"},3000);return}v.ocorrencias.splice(+b.dataset.delocc,1);persist();renderForm()}});
+  document.querySelectorAll("[data-o]").forEach(el=>{const h=()=>{v.ocorrencias[+el.dataset.o][el.dataset.f]=el.value;persist();if(el.tagName==="SELECT"){renderForm();document.getElementById("o"+el.dataset.o+"_"+el.dataset.f+"Outro")?.focus()}};el.tagName==="SELECT"?el.onchange=h:el.oninput=h});
+  document.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>{photoTarget=b.dataset.add;$("#picker").value="";$("#picker").click()});
+  document.querySelectorAll("[data-rm]").forEach(b=>{let armed=false;b.onclick=()=>{if(!armed){armed=true;b.textContent="?";setTimeout(()=>{armed=false;b.textContent="×"},2500);return}arrFor(b.dataset.rm).splice(+b.dataset.idx,1);persist();renderForm()}});
+  $("#rec")&&($("#rec").onchange=e=>{v.recusa.ativa=e.target.checked;persist();renderForm()});
+  document.querySelectorAll("[data-recf]").forEach(el=>{const h=()=>{v.recusa[el.dataset.recf]=el.value;persist();if(el.tagName==="SELECT"){renderForm();$("#rec_motivoOutro")?.focus()}};el.tagName==="SELECT"?el.onchange=h:el.oninput=h});
+  document.querySelectorAll("[data-pad]").forEach(setupPad);
+  document.querySelectorAll("[data-padclear]").forEach(b=>b.onclick=()=>{const c=document.querySelector(`[data-pad="${b.dataset.padclear}"]`);c.getContext("2d").clearRect(0,0,c.width,c.height);c._drawn=false});
+  document.querySelectorAll("[data-padok]").forEach(b=>b.onclick=()=>saveSig(b.dataset.padok,b));
+  document.querySelectorAll("[data-clearsig]").forEach(b=>b.onclick=()=>{const k=b.dataset.clearsig;if(k==="testemunha")v.recusa.sig=null;else delete v.sig[k];persist();renderForm()});
+}
+function updateCounts(){const c=counts();document.querySelectorAll("[data-step]").forEach(b=>b.querySelector("small").textContent=c[b.dataset.step])}
+const newOcc=()=>({item:"",itemOutro:"",local:"",dano:"",danoOutro:"",ident:"",alunos:"",desc:"",fotos:[]});
+const newPa=()=>({tipo:"",tipoOutro:"",horario:"",aluno:"",alunos:"",provid:"",providOutro:"",desc:"",fotos:[]});
+function arrFor(t){if(t.startsWith("e:")){const m=cur.v.entregaFotos||(cur.v.entregaFotos={});return m[t.slice(2)]||(m[t.slice(2)]=[])}return t==="ev"?cur.v.evidencias:t[0]==="p"?cur.v.passeioOc[+t.slice(1)].fotos:cur.v.ocorrencias[+t.slice(1)].fotos}
+
+/* ---------- photos ---------- */
+function shrink(file,max=1600){return new Promise((res,rej)=>{const url=URL.createObjectURL(file);const img=new Image();
+  img.onload=()=>{const s=Math.min(1,max/Math.max(img.width,img.height));const c=document.createElement("canvas");c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);
+   const ctx=c.getContext("2d");ctx.drawImage(img,0,0,c.width,c.height);
+   const stamp=nowStr();ctx.font=`600 ${Math.max(18,Math.round(c.width/45))}px system-ui,sans-serif`;const w=ctx.measureText(stamp).width;ctx.fillStyle="rgba(0,0,0,.55)";ctx.fillRect(c.width-w-24,c.height-ctx.measureText("M").width*2-12,w+24,ctx.measureText("M").width*2+12);
+   ctx.fillStyle="#fff";ctx.textBaseline="bottom";ctx.fillText(stamp,c.width-w-12,c.height-8);
+   URL.revokeObjectURL(url);c.toBlob(b=>b?res(b):rej(new Error("conv")),"image/jpeg",.82)};
+  img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error("img"))};img.src=url})}
+$("#picker").addEventListener("change",async e=>{
+  const files=[...e.target.files];if(!files.length||!assets||!cur)return;const target=photoTarget,id=cur.id;
+  toast(`Enviando ${files.length} foto${files.length>1?"s":""}…`);let ok=0;
+  for(const f of files){try{const blob=await shrink(f);const r=await assets.upload(blob,{type:"image/jpeg"});if(cur&&cur.id===id){arrFor(target).push(r.id);ok++}}
+    catch(err){toast(err?.code==="quota_exceeded"?"Espaço de fotos esgotado.":"Uma foto não foi enviada. Tente de novo.")}}
+  if(ok){persist(true);renderForm();toast(`${ok} foto${ok>1?"s":""} adicionada${ok>1?"s":""}`)}
+});
+
+/* ---------- signature pad ---------- */
+function setupPad(c){const r=c.getBoundingClientRect(),dpr=window.devicePixelRatio||1;c.width=r.width*dpr;c.height=r.height*dpr;const ctx=c.getContext("2d");ctx.scale(dpr,dpr);
+  ctx.lineWidth=2.4;ctx.lineCap="round";ctx.lineJoin="round";ctx.strokeStyle="#14233A";let down=false;
+  const p=e=>{const b=c.getBoundingClientRect();return[e.clientX-b.left,e.clientY-b.top]};
+  c.onpointerdown=e=>{down=true;c.setPointerCapture(e.pointerId);const[x,y]=p(e);ctx.beginPath();ctx.moveTo(x,y)};
+  c.onpointermove=e=>{if(!down)return;const[x,y]=p(e);ctx.lineTo(x,y);ctx.stroke();c._drawn=true};
+  c.onpointerup=c.onpointercancel=()=>down=false}
+async function saveSig(key,btn){const c=document.querySelector(`[data-pad="${key}"]`);const nome=$("#sn_"+key).value.trim();
+  if(!c._drawn){toast("Assine na área branca antes de confirmar.");return} if(!nome){toast("Informe o nome de quem assina.");return}
+  btn.disabled=true;btn.textContent="Salvando…";const id=cur.id;
+  try{const blob=await new Promise(r=>c.toBlob(r,"image/png"));const up=await assets.upload(blob,{type:"image/png"});if(!cur||cur.id!==id)return;
+    const rec={nome,img:up.id,quando:nowStr()};if(key==="testemunha")cur.v.recusa.sig=rec;else cur.v.sig[key]=rec;persist(true);renderForm()}
+  catch(e){btn.disabled=false;btn.textContent="Confirmar assinatura";toast("Assinatura não salva. Verifique a internet e tente de novo.")}}
+
+/* ---------- finish ---------- */
+function finish(){const v=cur.v,miss=[];
+  if(!v.ident.escola)miss.push("nome da escola");if(!v.ident.placa)miss.push("placa");
+  if(ITEMS.some(([k])=>!v.saida[k]))miss.push("vistoria de saída");if(ITEMS.some(([k])=>!v.chegada[k]))miss.push("vistoria de chegada");
+  if(!v.ocorrencia)miss.push("Sem/Com ocorrências no ônibus");if(!v.passeio)miss.push("Sem/Com ocorrências no passeio");
+  if(!v.sig.agente)miss.push("assinatura do coordenador / supervisor");
+  if(!v.sig.escola&&!(v.recusa.ativa&&v.recusa.sig))miss.push("assinatura do responsável (ou recusa com testemunha)");
+  if(miss.length){toast("Falta: "+miss.join(", "));return}
+  v.status="concluida";persist(true);toast("Vistoria concluída");renderForm()}
+
+/* ---------- actions: pdf, share, delete ---------- */
+const APP_LINK="https://claude.ai/artifact/RV81soBSSpnyaWXebJ2NrL";
+function actBtns(id,inForm){return `${downloads?`<button class="btn" data-pdf="${esc(id)}">Salvar PDF</button><button class="btn" data-share="${esc(id)}">Compartilhar</button>`:""}${inForm?"":`<span class="spacer"></span>`}${db?`<button class="btn ghost danger" data-del="${esc(id)}">Excluir</button>`:""}`}
+function getRec(id){return cur&&cur.id===id?cur.v:list.find(x=>x.id===id)?.data}
+function openRec(d){if(!d)return;cur={id:d.id,v:Object.assign(blank(),structuredClone(d.data))};step="ident";renderForm()}
+function openHash(){if(hashDone)return;hashDone=true;const h=location.hash;if(h.startsWith("#v-")&&!cur)openRec(list.find(x=>x.id===h.slice(3)))}
+function wireActs(){
+  document.querySelectorAll("[data-pdf]").forEach(b=>b.onclick=()=>savePdf(b.dataset.pdf,b));
+  document.querySelectorAll("[data-share]").forEach(b=>b.onclick=()=>shareRec(b.dataset.share));
+  document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>askDelete(b.dataset.del));
+}
+function modal(title,html,buttons){$("#mt").textContent=title;$("#mx").innerHTML=html;$("#mb").innerHTML="";
+  buttons.forEach(([label,cls,fn])=>{const b=document.createElement("button");b.className="btn "+cls;b.textContent=label;b.onclick=()=>fn(b);$("#mb").appendChild(b)});
+  $("#modal").hidden=false;$("#mb button:last-child")?.focus()}
+const closeModal=()=>{$("#modal").hidden=true};
+$("#modal").addEventListener("click",e=>{if(e.target.id==="modal")closeModal()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal()});
+function descRec(v){const i=v.ident||{};return esc(i.escola||"Escola não informada")+" · "+(i.data?fmtDate(i.data):"sem data")+(i.placa?" · "+esc(i.placa):"")}
+function askDelete(id){const v=getRec(id);if(!v)return;
+  modal("Excluir vistoria?",`<b>${descRec(v)}</b><br>A ficha, as fotos e as assinaturas serão apagadas. Não é possível desfazer.`,[["Cancelar","",closeModal],["Excluir vistoria","bad",b=>doDelete(id,b)]])}
+async function doDelete(id,b){const v=getRec(id);if(!v)return;b.disabled=true;b.textContent="Excluindo…";
+  const ids=[...(v.evidencias||[]),...Object.values(v.entregaFotos||{}).flat(),...(v.ocorrencias||[]).flatMap(o=>o.fotos||[]),...(v.passeioOc||[]).flatMap(o=>o.fotos||[]),...Object.values(v.sig||{}).map(s=>s&&s.img),v.recusa&&v.recusa.sig&&v.recusa.sig.img].filter(Boolean);
+  clearTimeout(saveTimer);const wasOpen=cur&&cur.id===id,keep=structuredClone(v);if(wasOpen)cur=null;
+  try{await db.collection("vistorias").doc(id).delete()}
+  catch(e){b.disabled=false;b.textContent="Excluir vistoria";toast("Não foi possível excluir. Verifique a internet e tente de novo.");if(wasOpen)cur={id,v:keep};return}
+  closeModal();toast("Vistoria excluída");renderList();
+  if(assets)for(const a of ids){try{await assets.delete(a)}catch(e){}}}
+async function shareRec(id){const v=getRec(id);if(!v)return;const btn=document.querySelector(`[data-share="${id}"]`)||{};
+  if(cur&&cur.id===id)persist(true);const old=btn.textContent;btn.disabled=true;btn.textContent="Gerando PDF…";
+  try{const {blob,name}=await buildPdf(id,Object.assign(blank(),structuredClone(v)));const file=new File([blob],name,{type:"application/pdf"});
+    const data={files:[file],title:name.replace(/\.pdf$/,"")};
+    if(!(navigator.canShare&&navigator.canShare({files:[file]}))){await downloads.save({filename:name,data:blob});toast("Este aparelho não abriu o menu de compartilhar. O PDF foi salvo em Downloads.");return}
+    try{await navigator.share(data)}
+    catch(e){if(e&&e.name==="AbortError")return;
+      modal("PDF pronto",`<b>${descRec(v)}</b><br>Toque em Compartilhar para escolher WhatsApp, e-mail ou outro app.`,[["Fechar","",closeModal],["Compartilhar","primary",async()=>{try{await navigator.share(data);closeModal()}catch(err){if(!err||err.name!=="AbortError")toast("Não foi possível compartilhar. Use Salvar PDF.")}}]])}}
+  catch(e){toast(e&&e.message==="lib"?"Não foi possível carregar o gerador de PDF. Conecte o tablet à internet uma vez e tente de novo.":"Não foi possível gerar o PDF. Tente de novo.")}
+  finally{btn.disabled=false;btn.textContent=old}}
+function selectLink(){const r=document.createRange();r.selectNodeContents($("#linkbox"));const s=getSelection();s.removeAllRanges();s.addRange(r);toast("Link selecionado. Use Copiar no menu do tablet.")}
+
+let libsP=null;
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=()=>rej(new Error("lib"));document.head.appendChild(s)})}
+function loadLibs(){return libsP||(libsP=loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js").then(()=>loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js")).catch(e=>{libsP=null;throw e}))}
+function imgData(id,max=1400){return new Promise(res=>{const im=new Image();im.onload=()=>{const s=Math.min(1,max/Math.max(im.naturalWidth,im.naturalHeight));const c=document.createElement("canvas");c.width=Math.max(1,Math.round(im.naturalWidth*s));c.height=Math.max(1,Math.round(im.naturalHeight*s));
+  const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);try{res({d:c.toDataURL("image/jpeg",.82),w:c.width,h:c.height})}catch(e){res(null)}};im.onerror=()=>res(null);getUrl(id).then(u=>{if(u)im.src=u;else res(null)},()=>res(null))})}
+const val=x=>x===""||x==null?"—":String(x);
+const obsL=(v,side,k)=>{const o=(v[side]||{})[k]||"",t=(v[side+"Txt"]||{})[k]||"";return o==="Outro"&&t?"Outro: "+t:o};
+const outro=(a,b)=>a==="Outro"&&b?"Outro: "+b:a;
+const slug=s=>(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^A-Za-z0-9]+/g,"-").replace(/^-|-$/g,"");
+
+async function savePdf(id,btn){const v=getRec(id);if(!v||!downloads)return;if(cur&&cur.id===id)persist(true);
+  const old=btn.textContent;btn.disabled=true;btn.textContent="Gerando PDF…";
+  try{const {blob,name}=await buildPdf(id,Object.assign(blank(),structuredClone(v)));btn.textContent="Salvando…";
+    const r=await downloads.save({filename:name,data:blob});closeModal();if(r&&r.status==="saved")toast("PDF pronto")}
+  catch(e){const c=e&&e.code;if(c==="declined"){}else if(c==="unavailable"||c==="not_granted")toast("Salvar arquivos não funciona nesta tela. Abra a página pelo app do Claude.");
+    else toast(e&&e.message==="lib"?"Não foi possível carregar o gerador de PDF. Verifique a internet.":"Não foi possível gerar o PDF. Tente de novo.")}
+  finally{btn.disabled=false;btn.textContent=old}}
+
+async function buildPdf(id,v){await loadLibs();
+  const {jsPDF}=window.jspdf;const doc=new jsPDF({unit:"mm",format:"a4"});
+  const W=210,H=297,M=14,CW=W-2*M;
+  const BRAND=[30,50,136],BANDS=[[226,112,63],[237,180,60],[141,192,63],[62,143,218]];
+  const stripe=(yy,h)=>BANDS.forEach((c,ix)=>{doc.setFillColor(...c);doc.rect(ix*W/4,yy,W/4+.3,h,"F")});
+  const NAVY=[20,35,58],YEL=[237,180,60],RED=[195,54,43],GREEN=[30,138,76],GREY=[91,102,118],LINE=[213,219,227],SOFT=[242,244,247],REDS=[251,227,224];
+  const i=v.ident;const code=("CSP-"+(i.data||"").replace(/-/g,"")+"-"+id.slice(-5)).toUpperCase();
+  let y=0;const ensure=h=>{if(y+h>H-18){doc.addPage();y=22}};const ink=()=>doc.setTextColor(...NAVY);
+  doc.setFillColor(...BRAND);doc.rect(0,0,W,27,"F");stripe(27,1.8);
+  doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.setFontSize(8);doc.text("CIRCUITO SP · AÇÃO TRANSPORTES",M,10);
+  doc.setFontSize(16);doc.text("Relatório de Vistoria do Ônibus",M,20);
+  doc.setFont("helvetica","normal");doc.setFontSize(8.5);doc.text("Nº "+code,W-M,10,{align:"right"});doc.text("Emitido em "+nowStr(),W-M,20,{align:"right"});
+  y=37;
+  const T={theme:"grid",styles:{font:"helvetica",fontSize:8.6,cellPadding:2.1,lineColor:LINE,lineWidth:.2,textColor:NAVY,valign:"middle"},headStyles:{fillColor:BRAND,textColor:[255,255,255],fontStyle:"bold",fontSize:8.2},margin:{left:M,right:M,top:22,bottom:18}};
+  const table=o=>{doc.autoTable({...T,...o,styles:{...T.styles,...(o.styles||{})},headStyles:{...T.headStyles,...(o.headStyles||{})},startY:y});y=doc.lastAutoTable.finalY+7};
+  const section=(n,t)=>{ensure(20);doc.setFillColor(...YEL);doc.rect(M,y-3.8,1.5,5,"F");ink();doc.setFont("helvetica","bold");doc.setFontSize(11.5);doc.text(n+". "+t.toUpperCase(),M+4,y);y+=5};
+  const sub=t=>{ensure(14);doc.setFont("helvetica","bold");doc.setFontSize(8.5);doc.setTextColor(...GREY);doc.text(t.toUpperCase(),M,y);y+=3.5};
+  const para=(t,size=9,color=NAVY,style="normal")=>{doc.setFont("helvetica",style);doc.setFontSize(size);doc.setTextColor(...color);const L=doc.splitTextToSize(t,CW);const lh=size*.42;ensure(L.length*lh+3);doc.text(L,M,y+lh*.8);y+=L.length*lh+4};
+  const grid=async(ids)=>{const gap=4,cw=(CW-2*gap)/3,ch=cw*.75;
+    for(let r=0;r<ids.length;r+=3){ensure(ch+8);const row=ids.slice(r,r+3);
+      for(const [c,aid] of row.entries()){const x=M+c*(cw+gap);doc.setFillColor(...SOFT);doc.rect(x,y,cw,ch,"F");const im=await imgData(aid);
+        if(im){const s=Math.min(cw/im.w,ch/im.h),w=im.w*s,h=im.h*s;doc.addImage(im.d,"JPEG",x+(cw-w)/2,y+(ch-h)/2,w,h)}
+        else{doc.setFont("helvetica","normal");doc.setFontSize(8);doc.setTextColor(...GREY);doc.text("Imagem indisponível",x+cw/2,y+ch/2,{align:"center"})}
+        doc.setFont("helvetica","normal");doc.setFontSize(7.5);doc.setTextColor(...GREY);doc.text("Foto "+(r+c+1),x,y+ch+3.6)}
+      y+=ch+8}y+=1};
+
+  const nb=ITEMS.filter(([k])=>v.chegada[k]==="avaria"&&v.saida[k]!=="avaria").map(x=>x[1]);
+  const ocb=v.ocorrencia==="com"?v.ocorrencias.length+" registrada(s)":v.ocorrencia==="sem"?"Nenhuma":"Não informado";
+  const ocp=v.passeio==="com"?v.passeioOc.length+" registrada(s)":v.passeio==="sem"?"Nenhuma":"Não informado";
+  table({head:[["Situação","Ocorrências no ônibus","Ocorrências no passeio","Avarias novas na chegada"]],body:[[v.status==="concluida"?"Concluída":"Em andamento",ocb,ocp,nb.length?nb.join(", "):"Nenhuma"]],
+    styles:{fontSize:9.2,fontStyle:"bold",cellPadding:3},
+    didParseCell:d=>{if(d.section!=="body")return;const t=d.cell.raw;d.cell.styles.textColor=d.column.index===0?(t==="Concluída"?GREEN:GREY):t==="Nenhuma"?GREEN:t==="Não informado"?GREY:RED}});
+
+  section(1,"Identificação do passeio");
+  const K={fillColor:SOFT,fontStyle:"bold",textColor:GREY,cellWidth:34};
+  const pairs=[["Data",i.data?fmtDate(i.data):""],["Embarque / retorno",(i.embarque||"—")+" / "+(i.retorno||"—")],["Escola",i.escola],["Guia",i.guia],["Responsável",i.resp],["Cargo",i.cargo],["RG / CPF",i.doc],["Telefone",i.tel],
+    ["Alunos embarcados",i.alunos],["Representantes da escola",i.adultos],["Ônibus (prefixo)",i.prefixo],["Placa",i.placa],["Motorista",i.motorista],["Coordenador / supervisor",i.agente]];
+  const body=[];for(let j=0;j<pairs.length;j+=2){const a=pairs[j],b=pairs[j+1];body.push([{content:a[0],styles:K},val(a[1]),b?{content:b[0],styles:K}:{content:"",styles:K},b?val(b[1]):""])}
+  body.push([{content:"Roteiro",styles:K},{content:val(i.roteiro),colSpan:3}]);
+  table({body});
+
+  section(2,"Vistoria do ônibus");
+  const L=x=>x==="ok"?"OK":x==="avaria"?"Avaria":"—";
+  table({head:[["Item","Saída","Observação na saída","Chegada","Observação na chegada"]],
+    body:ITEMS.map(([k,n])=>[n,L(v.saida[k]),val(obsL(v,"obsSaida",k)),L(v.chegada[k]),val(obsL(v,"obsChegada",k))]),
+    columnStyles:{0:{cellWidth:48,fontStyle:"bold"},1:{cellWidth:18,halign:"center"},3:{cellWidth:18,halign:"center"}},
+    didParseCell:d=>{if(d.section!=="body")return;const k=ITEMS[d.row.index][0];if(v.chegada[k]==="avaria"&&v.saida[k]!=="avaria")d.cell.styles.fillColor=REDS;
+      if(d.column.index===1||d.column.index===3){if(d.cell.raw==="Avaria"){d.cell.styles.textColor=RED;d.cell.styles.fontStyle="bold"}else if(d.cell.raw==="OK"){d.cell.styles.textColor=GREEN;d.cell.styles.fontStyle="bold"}}}});
+  if(nb.length){y-=4;para("Linhas destacadas: avaria nova encontrada na vistoria de chegada.",7.8,GREY,"italic")}
+  sub("Conferências");
+  const grp=t=>[{content:t,colSpan:2,styles:{fillColor:SOFT,fontStyle:"bold",textColor:GREY}}];
+  const ck=([k,l])=>[l,v.checks[k]?"Conferido":"Não conferido"];
+  table({body:[grp("Antes do embarque"),...CHECK_ANTES.map(ck),grp("Orientação aos alunos (feita pelo guia)"),...CHECK_ORIENT.map(ck),grp("Depois do desembarque"),...CHECK_DEPOIS.map(ck)],
+    columnStyles:{1:{cellWidth:30,halign:"center",fontStyle:"bold"}},
+    didParseCell:d=>{if(d.section==="body"&&d.column.index===1)d.cell.styles.textColor=d.cell.raw==="Conferido"?GREEN:RED}});
+  sub("Entregas aos alunos");
+  table({head:[["Entrega","Status","Fotos"]],body:ENTREGAS.map(([k,l])=>[l,v.checks[k]?"Conferido":"Não conferido",String(((v.entregaFotos||{})[k]||[]).length)]),
+    columnStyles:{1:{cellWidth:30,halign:"center",fontStyle:"bold"},2:{cellWidth:16,halign:"center"}},
+    didParseCell:d=>{if(d.section==="body"&&d.column.index===1)d.cell.styles.textColor=d.cell.raw==="Conferido"?GREEN:RED}});
+  for(const [k,l] of [...CHECK_ANTES,...CHECK_DEPOIS].filter(c=>PH.has(c[0])).concat(ENTREGAS)){const f=(v.entregaFotos||{})[k]||[];if(f.length){sub("Evidência: "+l);await grid(f)}}
+
+  section(3,"Ocorrências no ônibus");
+  if(v.ocorrencia!=="com")para(v.ocorrencia==="sem"?"Sem ocorrências no ônibus.":"Não informado.",9.5);
+  else{table({head:[["Nº","Item","Local","Tipo de dano","Aluno(s) identificado(s)","Detalhe"]],
+      body:v.ocorrencias.map((o,ix)=>[String(ix+1),val(outro(o.item,o.itemOutro)),val(o.local),val(outro(o.dano,o.danoOutro)),o.ident==="Sim"?"Sim"+(o.alunos?": "+o.alunos:""):val(o.ident),val(o.desc)]),
+      columnStyles:{0:{cellWidth:9,halign:"center",fontStyle:"bold"}}});
+    for(const [ix,o] of v.ocorrencias.entries())if(o.fotos&&o.fotos.length){sub("Fotos da ocorrência nº "+(ix+1));await grid(o.fotos)}}
+
+  section(4,"Ocorrências durante o passeio");
+  if(v.passeio!=="com")para(v.passeio==="sem"?"Sem ocorrências durante o passeio.":"Não informado.",9.5);
+  else{table({head:[["Nº","Tipo","Horário","Aluno envolvido","Providência tomada","Detalhe"]],
+      body:v.passeioOc.map((o,ix)=>["P"+(ix+1),val(outro(o.tipo,o.tipoOutro)),val(o.horario),o.aluno==="Sim"?"Sim"+(o.alunos?": "+o.alunos:""):val(o.aluno),val(outro(o.provid,o.providOutro)),val(o.desc)]),
+      columnStyles:{0:{cellWidth:10,halign:"center",fontStyle:"bold"},2:{cellWidth:16,halign:"center"}}});
+    for(const [ix,o] of v.passeioOc.entries())if(o.fotos&&o.fotos.length){sub("Fotos da ocorrência P"+(ix+1));await grid(o.fotos)}}
+
+  section(5,"Evidências fotográficas");
+  if(v.evidencias.length)await grid(v.evidencias);else para("Nenhuma foto de evidência anexada.",9.5);
+
+  section(6,"Termo de responsabilidade");
+  para(TERMO,9);
+  const bw=(CW-8)/3,bh=40;ensure(bh+4);
+  for(const [c,[k,role]] of SIGNERS.entries()){const s=v.sig[k],x=M+c*(bw+4);doc.setDrawColor(...LINE);doc.setLineWidth(.3);doc.rect(x,y,bw,bh);
+    if(s&&s.img){const im=await imgData(s.img,800);if(im){const f=Math.min((bw-8)/im.w,20/im.h);doc.addImage(im.d,"JPEG",x+(bw-im.w*f)/2,y+2+(20-im.h*f)/2,im.w*f,im.h*f)}}
+    else{doc.setFont("helvetica","italic");doc.setFontSize(8);doc.setTextColor(...GREY);doc.text("Não assinado",x+bw/2,y+13,{align:"center"})}
+    doc.setDrawColor(...NAVY);doc.line(x+4,y+24,x+bw-4,y+24);
+    ink();doc.setFont("helvetica","bold");doc.setFontSize(8.5);doc.text(doc.splitTextToSize((s&&s.nome)||"—",bw-8)[0],x+4,y+29);
+    doc.setFont("helvetica","normal");doc.setFontSize(7.8);doc.setTextColor(...GREY);doc.text(role,x+4,y+33.5);if(s&&s.quando)doc.text("Assinado em "+s.quando,x+4,y+37.5)}
+  y+=bh+7;
+  if(v.recusa&&v.recusa.ativa){const r=v.recusa;sub("Recusa de assinatura");
+    para("O responsável da escola recusou assinar. Motivo: "+val(outro(r.motivo,r.motivoOutro))+". Testemunha: "+val(r.testemunha)+(r.sig&&r.sig.quando?", assinado em "+r.sig.quando:"")+".",9);
+    if(r.sig&&r.sig.img){ensure(28);const im=await imgData(r.sig.img,800);if(im){const f=Math.min(60/im.w,22/im.h);doc.addImage(im.d,"JPEG",M,y,im.w*f,im.h*f);y+=im.h*f+4}}}
+
+  const n=doc.getNumberOfPages();
+  for(let p=1;p<=n;p++){doc.setPage(p);stripe(H-2.5,2.5);if(p>1)stripe(0,2);doc.setDrawColor(...LINE);doc.setLineWidth(.2);doc.line(M,H-12,W-M,H-12);
+    doc.setFont("helvetica","normal");doc.setFontSize(7.5);doc.setTextColor(...GREY);
+    doc.text("Circuito SP · Ação Transportes · Relatório de vistoria "+code,M,H-7);doc.text("Página "+p+" de "+n,W-M,H-7,{align:"right"});
+    if(p>1){doc.text("Relatório de Vistoria do Ônibus · "+(i.escola||"Escola não informada")+" · "+(i.data?fmtDate(i.data):""),M,12);doc.line(M,14.5,W-M,14.5)}}
+  const name="Vistoria_"+(slug(i.escola)||"escola")+"_"+(i.data||"sem-data")+(i.placa?"_"+slug(i.placa):"")+".pdf";
+  return {blob:doc.output("blob"),name}}
+
+/* ---------- local storage (IndexedDB on this tablet) ---------- */
+const IDB=new Promise((res,rej)=>{const r=indexedDB.open("checklist-circuito-sp",1);r.onupgradeneeded=()=>{r.result.createObjectStore("vistorias");r.result.createObjectStore("fotos")};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+const tx=(store,mode,fn)=>IDB.then(d=>new Promise((res,rej)=>{const t=d.transaction(store,mode);const q=fn(t.objectStore(store));t.oncomplete=()=>res(q.result);t.onerror=()=>rej(t.error);t.onabort=()=>rej(t.error)}));
+const idbPut=(st,v,k)=>tx(st,"readwrite",o=>o.put(v,k)),idbGet=(st,k)=>tx(st,"readonly",o=>o.get(k)),idbDel=(st,k)=>tx(st,"readwrite",o=>o.delete(k));
+const idbAll=st=>IDB.then(d=>new Promise((res,rej)=>{const out=[];const q=d.transaction(st).objectStore(st).openCursor();q.onsuccess=()=>{const c=q.result;if(c){out.push({id:c.key,data:c.value});c.continue()}else res(out)};q.onerror=()=>rej(q.error)}));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const URLS=new Map();const bl=id=>URLS.get(id)||"";
+async function getUrl(id){if(URLS.has(id))return URLS.get(id);const b=await idbGet("fotos",id);if(!b)return null;const u=URL.createObjectURL(b);URLS.set(id,u);return u}
+function hydrate(){document.querySelectorAll("img[data-blob]").forEach(im=>{if(!im.getAttribute("src"))getUrl(im.dataset.blob).then(u=>{if(u)im.src=u})})}
+db={collection:()=>({doc:id=>{id=id||uid();return{id,
+  set:async d=>{await idbPut("vistorias",d,id);const i=list.findIndex(x=>x.id===id);if(i>=0)list[i]={id,data:d};else list.push({id,data:d})},
+  delete:async()=>{await idbDel("vistorias",id);list=list.filter(x=>x.id!==id)}}}})};
+assets={upload:async b=>{const id=uid();await idbPut("fotos",b,id);return{id}},
+  delete:async id=>{await idbDel("fotos",id);const u=URLS.get(id);if(u){URL.revokeObjectURL(u);URLS.delete(id)}}};
+downloads={save:async({filename,data})=>{const u=URL.createObjectURL(data);const a=document.createElement("a");a.href=u;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000);return{status:"saved"}}};
+
+/* ---------- boot ---------- */
+renderList();
+(async()=>{
+  try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+  try{list=await idbAll("vistorias")}catch(e){toast("Não foi possível abrir o armazenamento do tablet.")}
+  ready=true;if(!cur)renderList();
+})();
+if("serviceWorker" in navigator)window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{});setTimeout(()=>loadLibs().catch(()=>{}),4000)});
+</script>
+
+</body>
+</html>
